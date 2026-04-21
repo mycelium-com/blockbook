@@ -983,8 +983,49 @@ func (b *EthereumRPC) GetTransactionSpecific(tx *bchain.Tx) (json.RawMessage, er
 	return json.RawMessage(m), err
 }
 
-// GetMempoolTransactions returns transactions in mempool
+// GetMempoolTransactions returns transactions in mempool.
+//
+// Prefers `txpool_content` over `eth_getBlockByNumber("pending")` when the
+// txpool namespace is available: the pending-block view only includes
+// *executable* txs (i.e. nonce = last_confirmed + 1 and contiguous), so
+// queued txs with nonce gaps are invisible to callers. This caused blockbook
+// address-level responses to "forget" pending txs that geth still held, while
+// per-tx lookups continued to return them — visible inconsistency to API
+// consumers.
 func (b *EthereumRPC) GetMempoolTransactions() ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), b.Timeout)
+	defer cancel()
+
+	// Each tx entry only needs the `hash` field; the full RPC response can be
+	// large so we deserialize into a narrow type to keep memory bounded.
+	type poolTx struct {
+		Hash string `json:"hash"`
+	}
+	var content struct {
+		Pending map[string]map[string]poolTx `json:"pending"`
+		Queued  map[string]map[string]poolTx `json:"queued"`
+	}
+	if err := b.RPC.CallContext(ctx, &content, "txpool_content"); err == nil {
+		txids := make([]string, 0, len(content.Pending)+len(content.Queued))
+		for _, byNonce := range content.Pending {
+			for _, tx := range byNonce {
+				if tx.Hash != "" {
+					txids = append(txids, tx.Hash)
+				}
+			}
+		}
+		for _, byNonce := range content.Queued {
+			for _, tx := range byNonce {
+				if tx.Hash != "" {
+					txids = append(txids, tx.Hash)
+				}
+			}
+		}
+		return txids, nil
+	}
+
+	// txpool namespace not available — fall back to the pending block (omits
+	// queued txs, but better than nothing).
 	raw, err := b.getBlockRaw("pending", 0, false)
 	if err != nil {
 		return nil, err
