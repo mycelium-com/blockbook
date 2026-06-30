@@ -24,10 +24,10 @@
         "package_name": "backend-ethereum-archive",
         "package_revision": "satoshilabs-1",
         "system_user": "ethereum",
-        "version": "3.3.10",
-        "binary_url": "https://github.com/erigontech/erigon/releases/download/v3.3.10/erigon_v3.3.10_linux_amd64.tar.gz",
+        "version": "3.5.0",
+        "binary_url": "https://github.com/erigontech/erigon/releases/download/v3.5.0/erigon_v3.5.0_linux_amd64.tar.gz",
         "verification_type": "sha256",
-        "verification_source": "b717a6fce275d02e517eb473fc5d4385a7b0cd1d9e9ed144e4ef712799a474b7",
+        "verification_source": "f3627abebe22969c319e21f797fef24a99756d0908181e0b6656a48d0a3fbc7b",
         "extract_command": "tar -C backend --strip-components=1 -xf",
         "exclude_files": [],
         "exec_command_template": "/bin/sh -c '{{.Env.BackendInstallPath}}/{{.Coin.Alias}}/erigon --chain mainnet --snap.keepblocks --db.size.limit 15TB --db.pagesize 16KB --prune.mode archive --externalcl --nat none --datadir {{.Env.BackendDataPath}}/{{.Coin.Alias}}/backend/erigon --port {{.Ports.BackendP2P}} --ws --ws.port {{.Ports.BackendRPC}} --http --http.port {{.Ports.BackendRPC}} --http.addr {{.Env.RPCBindHost}} --http.corsdomain \"*\" --http.vhosts \"*\" --http.api \"eth,net,web3,debug,txpool\" --authrpc.port {{.Ports.BackendAuthRpc}} --private.api.addr \"\" --torrent.port {{.Ports.BackendHttp}} --log.dir.path {{.Env.BackendDataPath}}/{{.Coin.Alias}}/backend --log.dir.prefix {{.Coin.Alias}}'",
@@ -41,8 +41,8 @@
         "client_config_file": "",
         "platforms": {
             "arm64": {
-                "binary_url": "https://github.com/erigontech/erigon/releases/download/v3.3.10/erigon_v3.3.10_linux_arm64.tar.gz",
-                "verification_source": "d85460c6e4c287235939d77051cb3abf3606b21498e71b29b2d8f61f87dddf5b"
+                "binary_url": "https://github.com/erigontech/erigon/releases/download/v3.5.0/erigon_v3.5.0_linux_arm64.tar.gz",
+                "verification_source": "09cef92002090a48555b2d979627aa7ae376544131c3f9b9e64e4b8132179a50"
             }
         }
     },
